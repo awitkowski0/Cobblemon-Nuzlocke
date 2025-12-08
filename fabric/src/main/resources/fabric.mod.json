@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "nuzlocke",
+  "version": "${version}",
+  "name": "Cobblemon: Nuzlocke",
+  "description": "Adds Nuzlocke challenge mode to Cobblemon with configurable rules for instant-release and other nuzlocke features.",
+  "authors": [
+    "funalex"
+  ],
+  "license": "MIT License",
+  "icon": "assets/nuzlocke/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.funalex.nuzlocke.FabricNuzlockeMod"
+    ]
+  },
+  "depends": {
+    "minecraft": "1.21.1",
+    "cobblemon": ">=1.6.0",
+    "fabric-language-kotlin": "*"
+  }
+}
