@@ -1,6 +1,6 @@
 modLoader = "javafml"
 loaderVersion = "[1,)"
-#issueTrackerURL = "A valid URL to your issue tracker where people can open bug tickets"
+issueTrackerURL = "https://github.com/awitkowski0/Cobblemon-Nuzlocke/issues"
 license = "MIT License"
 
 [[mods]]
@@ -9,25 +9,25 @@ version = "${version}"
 displayName = "Cobblemon: Nuzlocke"
 authors = "funalex"
 description = '''
-A very cool multi-line description!
+Nuzlocke addon for cobblemon
 '''
 #logoFile = ""
 
-[[dependencies.cobblemon_multiplatform_mdk]]
+[[dependencies.nuzlocke]]
 modId = "minecraft"
 mandatory = true
 versionRange = "[1.21.1]"
 ordering = "NONE"
 side = "BOTH"
 
-[[dependencies.cobblemon_multiplatform_mdk]]
+[[dependencies.nuzlocke]]
 modId = "neoforge"
 mandatory = true
 versionRange = "[21.1.66,)"
 ordering = "NONE"
 side = "BOTH"
 
-[[dependencies.cobblemon_multiplatform_mdk]]
+[[dependencies.nuzlocke]]
 modId = "cobblemon"
 mandatory = true
 versionRange = "[1.6,)"
