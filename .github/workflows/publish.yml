@@ -8,6 +8,7 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
+    environment: Publish
     
     permissions:
       contents: write
@@ -118,7 +119,7 @@ jobs:
           echo "changelog_file=/tmp/changelog.md" >> $GITHUB_OUTPUT
 
       - name: Build
-        run: ./gradlew :fabric:build -x test
+        run: ./gradlew :fabric:build :neoforge:build -x test
 
       - name: Create tag
         run: |
@@ -127,12 +128,13 @@ jobs:
           git tag -a "v${{ steps.new_version.outputs.new_version }}" -m "Release v${{ steps.new_version.outputs.new_version }}"
           git push origin "v${{ steps.new_version.outputs.new_version }}"
 
-      - name: Find JAR
-        id: find_jar
+      - name: Find JARs
+        id: find_jars
         run: |
-          JAR_FILE=$(find fabric/build/libs -name "*.jar" ! -name "*-sources.jar" ! -name "*-dev*.jar" | head -1)
-          echo "jar_file=$JAR_FILE" >> $GITHUB_OUTPUT
-          echo "Found: $JAR_FILE"
+          # Find both Fabric and NeoForge jars
+          JARS=$(find */build/libs -name "*${{ steps.new_version.outputs.new_version }}.jar" ! -name "*-sources.jar" ! -name "*-dev.jar" | tr '\n' ' ')
+          echo "jar_files=$JARS" >> $GITHUB_OUTPUT
+          echo "Found: $JARS"
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -140,7 +142,9 @@ jobs:
           tag_name: v${{ steps.new_version.outputs.new_version }}
           name: "Nuzlocke v${{ steps.new_version.outputs.new_version }}"
           body_path: /tmp/changelog.md
-          files: ${{ steps.find_jar.outputs.jar_file }}
+          files: |
+            fabric/build/libs/nuzlocke-fabric-${{ steps.new_version.outputs.new_version }}.jar
+            neoforge/build/libs/nuzlocke-neoforge-${{ steps.new_version.outputs.new_version }}.jar
           prerelease: ${{ steps.new_version.outputs.is_prerelease }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

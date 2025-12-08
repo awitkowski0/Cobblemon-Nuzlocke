@@ -80,4 +80,18 @@ publishMods {
         requires("fabric-api")
         requires("cobblemon")
     }
+
+    curseforge("curseforgeNeoForge") {
+        from(cfOptions)
+        file.set(layout.projectDirectory.file("neoforge/build/libs/nuzlocke-neoforge-${project.version}.jar"))
+        modLoaders.add("neoforge")
+        requires("cobblemon")
+    }
+
+    modrinth("modrinthNeoForge") {
+        from(mrOptions)
+        file.set(layout.projectDirectory.file("neoforge/build/libs/nuzlocke-neoforge-${project.version}.jar"))
+        modLoaders.add("neoforge")
+        requires("cobblemon")
+    }
 }
