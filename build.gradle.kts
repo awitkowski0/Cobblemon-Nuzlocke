@@ -68,7 +68,7 @@ publishMods {
     curseforge("curseforgeFabric") {
         from(cfOptions)
         file.set(layout.projectDirectory.file("fabric/build/libs/nuzlocke-fabric-${project.version}.jar"))
-        displayName.set("${project.version}")
+        displayName.set("Cobblemon: Nuzlocke ${project.version} ~ Fabric")
         modLoaders.add("fabric")
         requires("fabric-api")
         requires("cobblemon")
@@ -77,7 +77,7 @@ publishMods {
     modrinth("modrinthFabric") {
         from(mrOptions)
         file.set(layout.projectDirectory.file("fabric/build/libs/nuzlocke-fabric-${project.version}.jar"))
-        displayName.set("${project.version}")
+        displayName.set("Cobblemon: Nuzlocke ${project.version} ~ Fabric")
         modLoaders.add("fabric")
         requires("fabric-api")
         requires("cobblemon")
@@ -86,7 +86,7 @@ publishMods {
     curseforge("curseforgeNeoForge") {
         from(cfOptions)
         file.set(layout.projectDirectory.file("neoforge/build/libs/nuzlocke-neoforge-${project.version}.jar"))
-        displayName.set("${project.version}")
+        displayName.set("Cobblemon: Nuzlocke ${project.version} ~ Neoforge")
         modLoaders.add("neoforge")
         requires("cobblemon")
     }
@@ -94,7 +94,7 @@ publishMods {
     modrinth("modrinthNeoForge") {
         from(mrOptions)
         file.set(layout.projectDirectory.file("neoforge/build/libs/nuzlocke-neoforge-${project.version}.jar"))
-        displayName.set("${project.version}")
+        displayName.set("Cobblemon: Nuzlocke ${project.version} ~ Neoforge")
         modLoaders.add("neoforge")
         requires("cobblemon")
     }
