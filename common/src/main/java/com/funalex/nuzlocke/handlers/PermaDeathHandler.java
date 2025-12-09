@@ -12,7 +12,9 @@ import com.funalex.nuzlocke.state.NuzlockeRunState;
 import com.funalex.nuzlocke.state.NuzlockeStateManager;
 import kotlin.Unit;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
 
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -138,16 +140,26 @@ public class PermaDeathHandler {
             return;
         }
 
+        ServerPlayer player = pokemon.getOwnerPlayer();
+
+        if (player != null && config.announceDeaths) {
+            String message = config.deathMessage;
+            message = message.replace("%player%", player.getDisplayName().getString());
+            message = message.replace("%pokemon%", nickname);
+
+            MutableComponent announceMessage = Component.literal(message);
+
+            if (!player.getCommandSenderWorld().players().isEmpty()) {
+                for (Player player1 : player.getCommandSenderWorld().players()) {
+                    player1.sendSystemMessage(announceMessage);
+                }
+            }
+        }
+
         var storeCoords = pokemon.getStoreCoordinates().get();
         if (storeCoords != null) {
             var store = storeCoords.getStore();
             store.remove(pokemon);
-
-            // Notify the player
-            ServerPlayer player = pokemon.getOwnerPlayer();
-            if (player != null) {
-                player.sendSystemMessage(Component.literal("§c" + nickname + " §7has been released from your party..."));
-            }
         }
     }
 }
