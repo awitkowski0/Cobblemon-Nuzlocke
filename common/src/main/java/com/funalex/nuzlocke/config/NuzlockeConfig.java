@@ -23,7 +23,7 @@ public class NuzlockeConfig {
      * Message format for death announcements. Use %pokemon% for name, %species% for
      * species
      */
-    public String deathMessage = "%pokemon% has fallen in battle...";
+    public String deathMessage = "§7%player%'s §c%pokemon%§7 has fallen in battle...";
 
     /**
      * How to handle dead Pokemon.
