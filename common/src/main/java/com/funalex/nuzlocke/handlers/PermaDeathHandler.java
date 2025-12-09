@@ -140,20 +140,22 @@ public class PermaDeathHandler {
             return;
         }
 
-        // Notify the player
         ServerPlayer player = pokemon.getOwnerPlayer();
 
-        String message = config.deathMessage;
-        message = message.replaceAll("%player%", player.getDisplayName().getString());
-        message = message.replaceAll("%pokemon%", nickname);
+        if (player != null && config.announceDeaths) {
+            String message = config.deathMessage;
+            message = message.replace("%player%", player.getDisplayName().getString());
+            message = message.replace("%pokemon%", nickname);
 
-        MutableComponent announceMessage = Component.literal(message);
+            MutableComponent announceMessage = Component.literal(message);
 
-        if (config.announceDeaths && player != null && player.getCommandSenderWorld().players() != null) {
-            for (Player player1 : player.getCommandSenderWorld().players()) {
-                player1.sendSystemMessage(announceMessage);
+            if (!player.getCommandSenderWorld().players().isEmpty()) {
+                for (Player player1 : player.getCommandSenderWorld().players()) {
+                    player1.sendSystemMessage(announceMessage);
+                }
             }
         }
+
         var storeCoords = pokemon.getStoreCoordinates().get();
         if (storeCoords != null) {
             var store = storeCoords.getStore();
