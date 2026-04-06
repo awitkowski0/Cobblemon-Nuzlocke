@@ -13,8 +13,20 @@ public class NuzlockeRunState {
 
     private int totalDeaths = 0;
 
+    private final Map<UUID, Integer> pokemonLives = new HashMap<>();
+
     public NuzlockeRunState(UUID playerId) {
         this.playerId = playerId;
+    }
+
+    public int getLives(UUID pokemonId) {
+        return pokemonLives.getOrDefault(pokemonId, com.funalex.nuzlocke.config.NuzlockeConfig.getInstance().maxLives);
+    }
+
+    public int decreaseLife(UUID pokemonId) {
+        int lives = getLives(pokemonId) - 1;
+        pokemonLives.put(pokemonId, lives);
+        return lives;
     }
 
     public void startRun() {
@@ -23,6 +35,7 @@ public class NuzlockeRunState {
         this.deadPokemon.clear();
         this.graveyard.clear();
         this.totalDeaths = 0;
+        this.pokemonLives.clear();
     }
 
     public void endRun() {

@@ -32,6 +32,12 @@ public class NuzlockeConfig {
      */
     public DeathHandlingMode deathHandling = DeathHandlingMode.RELEASE;
 
+    /** Max lives per Pokemon before they die */
+    public int maxLives = 1;
+
+    /** Message broadcasted when a Pokemon loses a life but doesn't die completely */
+    public String lifeLostMessage = "§7%player%'s §e%pokemon%§7 fainted! It has %lives% lives remaining.";
+
     public enum DeathHandlingMode {
         RELEASE,
         MARK_ONLY
