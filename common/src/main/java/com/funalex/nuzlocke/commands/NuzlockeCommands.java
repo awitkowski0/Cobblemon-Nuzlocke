@@ -3,9 +3,13 @@ package com.funalex.nuzlocke.commands;
 import com.funalex.nuzlocke.NuzlockeManager;
 import com.funalex.nuzlocke.config.NuzlockeConfig;
 import com.funalex.nuzlocke.state.NuzlockeRunState;
+import com.cobblemon.mod.common.Cobblemon;
+import com.cobblemon.mod.common.api.storage.party.PlayerPartyStore;
+import com.cobblemon.mod.common.pokemon.Pokemon;
 import com.funalex.nuzlocke.state.NuzlockeStateManager;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.BoolArgumentType;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import net.minecraft.commands.CommandBuildContext;
@@ -64,6 +68,12 @@ public class NuzlockeCommands {
                                 .then(literal("deathmessage")
                                         .then(argument("message", StringArgumentType.greedyString())
                                                 .executes(NuzlockeCommands::setDeathMessage)))
+                                .then(literal("maxlives")
+                                        .then(argument("lives", IntegerArgumentType.integer(1))
+                                                .executes(NuzlockeCommands::setMaxLives)))
+                                .then(literal("lifelostmessage")
+                                        .then(argument("message", StringArgumentType.greedyString())
+                                                .executes(NuzlockeCommands::setLifeLostMessage)))
                                 .then(literal("show")
                                         .executes(NuzlockeCommands::showConfig))));
     }
@@ -124,6 +134,22 @@ public class NuzlockeCommands {
         player.sendSystemMessage(Component.literal("§7Duration: §f" + hours + "h " + minutes + "m"));
 
         player.sendSystemMessage(Component.literal("§cPokémon Lost: §f" + state.getTotalDeaths()));
+
+        player.sendSystemMessage(Component.literal(""));
+        player.sendSystemMessage(Component.literal("§7Party Status:"));
+        PlayerPartyStore party = Cobblemon.INSTANCE.getStorage().getParty(player);
+        for (int i = 0; i < party.size(); i++) {
+            Pokemon pokemon = party.get(i);
+            if (pokemon != null) {
+                String nickname = pokemon.getNickname() != null ? pokemon.getNickname().getString()
+                        : pokemon.getSpecies().getName();
+                int lives = state.getLives(pokemon.getUuid());
+                int maxLives = NuzlockeConfig.getInstance().maxLives;
+
+                String danger = lives == 1 && maxLives > 1 ? " §c- DANGER" : "";
+                player.sendSystemMessage(Component.literal("§8Slot " + (i + 1) + ": §f" + nickname + " §7(" + lives + "/" + maxLives + " Lives)" + danger));
+            }
+        }
 
         return 1;
     }
@@ -226,6 +252,22 @@ public class NuzlockeCommands {
         return 1;
     }
 
+    private static int setMaxLives(CommandContext<CommandSourceStack> ctx) {
+        int lives = IntegerArgumentType.getInteger(ctx, "lives");
+        NuzlockeConfig.getInstance().maxLives = lives;
+        NuzlockeConfig.save();
+        ctx.getSource().sendSuccess(() -> Component.literal("Max lives set to: " + lives), true);
+        return 1;
+    }
+
+    private static int setLifeLostMessage(CommandContext<CommandSourceStack> ctx) {
+        String message = StringArgumentType.getString(ctx, "message");
+        NuzlockeConfig.getInstance().lifeLostMessage = message;
+        NuzlockeConfig.save();
+        ctx.getSource().sendSuccess(() -> Component.literal("Life lost message set to: " + message), true);
+        return 1;
+    }
+
     private static int showConfig(CommandContext<CommandSourceStack> ctx) {
         NuzlockeConfig config = NuzlockeConfig.getInstance();
 
@@ -234,6 +276,8 @@ public class NuzlockeCommands {
         ctx.getSource().sendSuccess(() -> Component.literal("deathHandling: " + config.deathHandling.name()),
                 false);
         ctx.getSource().sendSuccess(() -> Component.literal("deathMessage: " + config.deathMessage), false);
+        ctx.getSource().sendSuccess(() -> Component.literal("maxLives: " + config.maxLives), false);
+        ctx.getSource().sendSuccess(() -> Component.literal("lifeLostMessage: " + config.lifeLostMessage), false);
 
         return 1;
     }

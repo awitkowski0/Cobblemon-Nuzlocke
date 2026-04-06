@@ -55,6 +55,27 @@ public class PermaDeathHandler {
         if (state != null && !state.isPokemonDead(pokemon.getUuid())) {
             String nickname = pokemon.getNickname() != null ? pokemon.getNickname().getString()
                     : pokemon.getSpecies().getName();
+
+            int lives = state.decreaseLife(pokemon.getUuid());
+
+            if (lives > 0) {
+                if (NuzlockeConfig.getInstance().announceDeaths) {
+                    ServerPlayer player = pokemon.getOwnerPlayer();
+                    if (player != null) {
+                        String msg = NuzlockeConfig.getInstance().lifeLostMessage
+                            .replace("%player%", player.getDisplayName().getString())
+                            .replace("%pokemon%", nickname)
+                            .replace("%lives%", String.valueOf(lives));
+                        MutableComponent comp = Component.literal(msg);
+                        for (Player p : player.getCommandSenderWorld().players()) {
+                            p.sendSystemMessage(comp);
+                        }
+                    }
+                }
+                NuzlockeStateManager.getInstance().save();
+                return Unit.INSTANCE;
+            }
+
             String species = pokemon.getSpecies().getName();
             int level = pokemon.getLevel();
 
@@ -89,6 +110,27 @@ public class PermaDeathHandler {
         if (state != null && !state.isPokemonDead(pokemon.getUuid())) {
             String nickname = pokemon.getNickname() != null ? pokemon.getNickname().getString()
                     : pokemon.getSpecies().getName();
+
+            int lives = state.decreaseLife(pokemon.getUuid());
+
+            if (lives > 0) {
+                if (NuzlockeConfig.getInstance().announceDeaths) {
+                    ServerPlayer player = pokemon.getOwnerPlayer();
+                    if (player != null) {
+                        String msg = NuzlockeConfig.getInstance().lifeLostMessage
+                            .replace("%player%", player.getDisplayName().getString())
+                            .replace("%pokemon%", nickname)
+                            .replace("%lives%", String.valueOf(lives));
+                        MutableComponent comp = Component.literal(msg);
+                        for (Player p : player.getCommandSenderWorld().players()) {
+                            p.sendSystemMessage(comp);
+                        }
+                    }
+                }
+                NuzlockeStateManager.getInstance().save();
+                return Unit.INSTANCE;
+            }
+
             String species = pokemon.getSpecies().getName();
             int level = pokemon.getLevel();
 
