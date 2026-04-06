@@ -28,69 +28,14 @@ public class PermaDeathHandler {
             return;
         registered = true;
 
-        CobblemonEvents.BATTLE_FAINTED.subscribe(Priority.NORMAL, (Consumer<BattleFaintedEvent>) PermaDeathHandler::onBattleFaint);
+        // Only use POKEMON_FAINTED to track deaths to avoid double-counting.
+        // Cobblemon triggers POKEMON_FAINTED when health reaches 0, which happens in both battle and overworld.
         CobblemonEvents.POKEMON_FAINTED.subscribe(Priority.NORMAL, (Consumer<PokemonFaintedEvent>) PermaDeathHandler::onPokemonFaint);
         CobblemonEvents.POKEMON_HEALED.subscribe(Priority.HIGH, (Consumer<PokemonHealedEvent>) PermaDeathHandler::onPokemonHealed);
     }
 
     /**
-     * Handle a Pokemon fainting during battle
-     */
-    private static Unit onBattleFaint(BattleFaintedEvent event) {
-        if (!NuzlockeConfig.getInstance().permaDeathRule) {
-            return Unit.INSTANCE;
-        }
-
-        BattlePokemon battlePokemon = event.getKilled();
-        Pokemon pokemon = battlePokemon.getEffectedPokemon();
-
-        UUID ownerUuid = getOwnerUuid(pokemon);
-        if (ownerUuid == null)
-            return Unit.INSTANCE;
-
-        if (!NuzlockeStateManager.getInstance().hasActiveRun(ownerUuid))
-            return Unit.INSTANCE;
-
-        NuzlockeRunState state = NuzlockeStateManager.getInstance().getState(ownerUuid);
-        if (state != null && !state.isPokemonDead(pokemon.getUuid())) {
-            String nickname = pokemon.getNickname() != null ? pokemon.getNickname().getString()
-                    : pokemon.getSpecies().getName();
-
-            int lives = state.decreaseLife(pokemon.getUuid());
-
-            if (lives > 0) {
-                if (NuzlockeConfig.getInstance().announceDeaths) {
-                    ServerPlayer player = pokemon.getOwnerPlayer();
-                    if (player != null) {
-                        String msg = NuzlockeConfig.getInstance().lifeLostMessage
-                            .replace("%player%", player.getDisplayName().getString())
-                            .replace("%pokemon%", nickname)
-                            .replace("%lives%", String.valueOf(lives));
-                        MutableComponent comp = Component.literal(msg);
-                        for (Player p : player.getCommandSenderWorld().players()) {
-                            p.sendSystemMessage(comp);
-                        }
-                    }
-                }
-                NuzlockeStateManager.getInstance().save();
-                return Unit.INSTANCE;
-            }
-
-            String species = pokemon.getSpecies().getName();
-            int level = pokemon.getLevel();
-
-            state.markPokemonDead(pokemon.getUuid(), nickname, species, level);
-            NuzlockeStateManager.getInstance().save();
-
-            // Auto-release if configured
-            releasePokemon(pokemon, nickname);
-        }
-
-        return Unit.INSTANCE;
-    }
-
-    /**
-     * Handle a Pokemon fainting outside of battle
+     * Handle a Pokemon fainting (works for both in and out of battle)
      */
     private static Unit onPokemonFaint(PokemonFaintedEvent event) {
         if (!NuzlockeConfig.getInstance().permaDeathRule) {
